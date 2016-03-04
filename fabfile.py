@@ -23,6 +23,11 @@ def runserver():
         _django('runserver')
 
 
+def testf(target):
+    with _venv():
+        _django('test functional_tests.{} -v 2'.format(target))
+
+
 def _django(command):
     return local('python manage.py {}'.format(command))
 
