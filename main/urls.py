@@ -7,6 +7,12 @@ urlpatterns = [
     url(
         r'^$',
         views.HomepageView.as_view(),
-        name='homepage'
+        name='homepage',
+    ),
+
+    url(
+        r'^new$',
+        views.new_game,
+        name='new_game',
     ),
 ]

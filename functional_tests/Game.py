@@ -11,7 +11,7 @@ class TestStartGame(BaseTestCase):
         self.browser.find_element_by_link_text('New game').click()
 
         # She is taken to a game creator.
-        self.assertEqual(self.browser.current_url, '/new')
+        self.assertEqual(self.browser.current_url, '{}/new'.format(self.live_server_url))
 
         # She sees a board.
         self.browser.find_element_by_id('id_board')
@@ -26,7 +26,7 @@ class TestStartGame(BaseTestCase):
         self.browser.find_element_by_tag_name('form').submit()
 
         # She is redirected to the same page.
-        self.assertEqual(self.browser.current_url, '/new')
+        self.assertEqual(self.browser.current_url, '{}/new'.format(self.live_server_url))
 
         # She sees an error.
         self.assertIn(self.browser.page_source, 'Too few ships!')
