@@ -15,3 +15,6 @@ class BaseTestCase(StaticLiveServerTestCase):
 
     def tearDown(self):
         self.browser.close()
+
+    def get(self, url):
+        self.browser.get('{}{}'.format(self.live_server_url, url))
