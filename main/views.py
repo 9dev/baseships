@@ -27,3 +27,9 @@ class NewGameView(FormView):
 
 class GameDetailView(DetailView):
     model = Game
+
+    def get_context_data(self, **kwargs):
+        context = super(GameDetailView, self).get_context_data(**kwargs)
+        context['board_size'] = BOARD_SIZE
+        context['player_board'] = self.object.player_board.fields
+        return context

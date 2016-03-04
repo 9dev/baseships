@@ -1,5 +1,34 @@
 {% extends "base.html" %}
 
 {% block content %}
-    Hello game
+    <h1>You</h1>
+
+    {% with board_owner='user' %}
+        {% include 'main/snippets/board.html' %}
+    {% endwith %}
 {% endblock content %}
+
+{% block body_extra %}
+    <script>
+        $(function(){
+            var color;
+            var player_board = {{ player_board|safe }};
+
+            for(var i = 0; i < player_board.length; ++i) {
+                for (var j = 0; j < player_board.length; ++j) {
+                    switch(player_board[i][j])
+                    {
+                        case '1':
+                            color = 'green';
+                            break;
+                        case '0':
+                        default:
+                            color = 'silver';
+                            break;
+                    }
+                    $('#id_userfield_' + i + '_' + j).css('background-color', color);
+                }
+            }
+        });
+    </script>
+{% endblock body_extra %}
