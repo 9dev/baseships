@@ -15,4 +15,10 @@ urlpatterns = [
         views.NewGameView.as_view(),
         name='new_game',
     ),
+
+    url(
+        r'^game/(?P<pk>[\d]+)$',
+        views.GameDetailView.as_view(),
+        name='game_detail',
+    ),
 ]

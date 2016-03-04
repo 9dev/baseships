@@ -1,7 +1,8 @@
-from django.views.generic import FormView, TemplateView
+from django.views.generic import DetailView, FormView, TemplateView
+from django.http import HttpResponseRedirect
 
 from main.forms import NewGameForm
-from main.models import Board, BOARD_SIZE
+from main.models import Board, BOARD_SIZE, Game
 
 
 class HomepageView(TemplateView):
@@ -11,7 +12,6 @@ class HomepageView(TemplateView):
 class NewGameView(FormView):
     template_name = 'main/new_game.html'
     form_class = NewGameForm
-    success_url = '/xyz'
 
     def get_context_data(self, **kwargs):
         context = super(NewGameView, self).get_context_data(**kwargs)
@@ -19,6 +19,11 @@ class NewGameView(FormView):
         return context
 
     def form_valid(self, form):
-        board = Board(owner=self.request.user, fields=form.cleaned_data['fields'])
-        board.save()
-        return super(NewGameView, self).form_valid(form)
+        player_board = Board.objects.create(owner=self.request.user, fields=form.cleaned_data['fields'])
+        ai_board = Board.objects.create()
+        game = Game.objects.create(player=self.request.user, player_board=player_board, ai_board=ai_board)
+        return HttpResponseRedirect(game.get_absolute_url())
+
+
+class GameDetailView(DetailView):
+    model = Game
