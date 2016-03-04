@@ -1,9 +1,15 @@
 {% extends "base.html" %}
 
 {% block content %}
+    {% if form.errors %}
+        {% for _, errors in form.errors.items %}
+            {{ errors }}
+        {% endfor %}
+    {% endif %}
+
     <form action="" method="post" id="id_board">
         {% csrf_token %}
-        {{ form.as_p }}
+        {{ form.fields }}
 
         {% for i in "x"|rjust:board_size %}
             {% for j in "x"|rjust:board_size %}
