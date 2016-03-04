@@ -6,7 +6,7 @@ from main.models import BOARD_SIZE
 
 
 class NewGameForm(forms.Form):
-    fields = forms.CharField(max_length=BOARD_SIZE**2, widget=forms.HiddenInput(), label="Board")
+    fields = forms.CharField(max_length=BOARD_SIZE**2,min_length=BOARD_SIZE**2, widget=forms.HiddenInput(), label="Board")
 
     def clean_fields(self):
         fields = self.cleaned_data['fields']
@@ -17,4 +17,4 @@ class NewGameForm(forms.Form):
         if fields.count('1') < 2:
             raise forms.ValidationError('Too few ships!')
 
-        return [[fields[i+j] for j in range(BOARD_SIZE)] for i in range(BOARD_SIZE)]  # convert str to list
+        return [fields[i:i+BOARD_SIZE] for i in range(0, BOARD_SIZE**2, BOARD_SIZE)]  # convert str to list
