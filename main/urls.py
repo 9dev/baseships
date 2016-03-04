@@ -12,7 +12,7 @@ urlpatterns = [
 
     url(
         r'^new$',
-        views.new_game,
+        views.NewGameView.as_view(),
         name='new_game',
     ),
 ]
