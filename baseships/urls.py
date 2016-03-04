@@ -1,10 +1,16 @@
-from django.conf.urls import include, url
+from django.conf import settings
+from django.conf.urls import url, include
+from django.conf.urls.static import static
 from django.contrib import admin
 
-urlpatterns = [
-    # Examples:
-    # url(r'^$', 'baseships.views.home', name='home'),
-    # url(r'^blog/', include('blog.urls')),
+from main import urls as main_urls
 
+
+urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
+    url(r'', include(main_urls))
 ]
+
+
+if settings.DEBUG:
+    urlpatterns = urlpatterns + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
