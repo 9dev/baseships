@@ -9,6 +9,12 @@ GREEN = 'rgba(0, 128, 0, 1)'
 
 class TestStartGame(BaseTestCase):
 
+    def setUp(self):
+        super(TestStartGame, self).setUp()
+
+        # Florence logs in as an admin.
+        self.login_as_admin()
+
     def create_ship_part(self, x, y):
         field = self.browser.find_element_by_id('id_field_{}_{}'.format(x, y))
         field.click()
