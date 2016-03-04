@@ -1,37 +1,42 @@
-<form action="" method="post" id="id_board">
-    {% csrf_token %}
-    {{ form.as_p }}
+{% extends "base.html" %}
 
-    {% for i in "x"|rjust:board_size %}
-        {% for j in "x"|rjust:board_size %}
-            <button type="button"
-                    id="id_field_{{ forloop.parentloop.counter0 }}_{{ forloop.counter0 }}"
-                    value="{{ forloop.parentloop.counter0 }},{{ forloop.counter0 }}">
-            </button>
+{% block content %}
+    <form action="" method="post" id="id_board">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        {% for i in "x"|rjust:board_size %}
+            {% for j in "x"|rjust:board_size %}
+                <button type="button"
+                        id="id_field_{{ forloop.parentloop.counter0 }}_{{ forloop.counter0 }}"
+                        value="{{ forloop.parentloop.counter0 }},{{ forloop.counter0 }}">
+                </button>
+            {% endfor %}
         {% endfor %}
-    {% endfor %}
 
-    <input type="submit" value="START">
-</form>
+        <input type="submit" value="START">
+    </form>
+{% endblock content %}
 
-<script src="http://code.jquery.com/jquery-2.2.1.min.js"></script>
-<script>
-    $(function(){
-        var tmp, indexes, position;
-        var $fields = $('#id_fields');
+{% block body_extra %}
+    <script>
+        $(function(){
+            var tmp, indexes, position;
+            var $fields = $('#id_fields');
 
-        $fields.val(
-            new Array({{ board_size }} * {{ board_size }} + 1).join('0')
-        );
+            $fields.val(
+                new Array({{ board_size }} * {{ board_size }} + 1).join('0')
+            );
 
-        $('button').click(function() {
-            $(this).css('background-color', 'green');
+            $('button').click(function() {
+                $(this).css('background-color', 'green');
 
-            indexes = $(this).val().split(',');
-            position = {{ board_size }} * parseInt(indexes[0]) + parseInt(indexes[1]);
-            tmp = $fields.val().substr(0, position) + '1' + $fields.val().substr(position+1);
+                indexes = $(this).val().split(',');
+                position = {{ board_size }} * parseInt(indexes[0]) + parseInt(indexes[1]);
+                tmp = $fields.val().substr(0, position) + '1' + $fields.val().substr(position+1);
 
-            $fields.val(tmp);
+                $fields.val(tmp);
+            });
         });
-    });
-</script>
+    </script>
+{% endblock body_extra %}

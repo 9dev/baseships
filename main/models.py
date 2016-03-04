@@ -3,7 +3,7 @@ import json
 from django.db import models
 
 
-BOARD_SIZE = 2
+BOARD_SIZE = 10
 FIELDS_LENGTH = len(json.dumps([[0] * BOARD_SIZE] * BOARD_SIZE))
 
 
