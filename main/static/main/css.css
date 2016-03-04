@@ -1,0 +1,11 @@
+button {
+    margin: 0;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    background-color: silver;
+}
+
+#id_board {
+    margin: 0 auto;
+}
