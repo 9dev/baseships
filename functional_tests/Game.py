@@ -7,10 +7,10 @@ SILVER = 'rgba(192, 192, 192, 1)'
 GREEN = 'rgba(0, 128, 0, 1)'
 
 
-class TestStartGame(BaseTestCase):
+class TestGameStart(BaseTestCase):
 
     def setUp(self):
-        super(TestStartGame, self).setUp()
+        super(TestGameStart, self).setUp()
 
         # Florence logs in as an admin.
         self.login_as_admin()
@@ -90,3 +90,22 @@ class TestStartGame(BaseTestCase):
 
         # She sees her ships on her board.
         self.assert_ships_are_present()
+
+
+class TestGamePlay(BaseTestCase):
+
+    def test_can_play(self):
+        # Florence launches a new game.
+        # She clicks on one of the boxes on opponent's board.
+        # Clicked element becomes white and the log says "You missed!".
+        # Florence waits until the opponent finishes his move (or many moves if it manages to hit one of her ships).
+        # She notices that at least one box on her board changed its color from silver.
+        # She also notices at least one new log message.
+        # She clicks on another box on opponent's board.
+        # Clicked element becomes red and the log says "You hit a ship!"
+        # Opponent does not perform any moves, Florence has another turn.
+        # Florence clicks on yet another box and make one of opponent's ships sink.
+        # Opponent's still not moving.
+        # Florence clicks on a different box and misses.
+        # Opponent finally performs his move(s).
+        self.fail()
