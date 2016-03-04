@@ -34,7 +34,7 @@ class TestStartGame(BaseTestCase):
         for length, n in SHIPS.items():
             for i in range(n):
                 for j in range(length):
-                    field = self.browser.find_element_by_id('id_field_{}_{}'.format(line, j))
+                    field = self.browser.find_element_by_id('id_userfield_{}_{}'.format(line, j))
                     self.assertEqual(field.value_of_css_property('background-color'), GREEN)
                 line += 1
 

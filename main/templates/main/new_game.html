@@ -11,15 +11,7 @@
         {% csrf_token %}
         {{ form.fields }}
 
-        {% for i in "x"|rjust:board_size %}
-            {% for j in "x"|rjust:board_size %}
-                <button type="button"
-                        id="id_field_{{ forloop.parentloop.counter0 }}_{{ forloop.counter0 }}"
-                        value="{{ forloop.parentloop.counter0 }},{{ forloop.counter0 }}">
-                </button>
-            {% endfor %}
-        {% endfor %}
-
+        {% include 'main/snippets/board.html' %}
         <input type="submit" value="START">
     </form>
 {% endblock content %}
