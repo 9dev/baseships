@@ -20,6 +20,7 @@
         $(function(){
             var color;
             var player_board = {{ player_board|safe }};
+            var ai_board = {{ ai_board|safe }};
             var $log = $('#log');
 
             var states = {
@@ -41,14 +42,21 @@
                 3: 'hit a ship'
             };
 
-            // populate user's board
+            // populate users' boards
 
-            for(var i = 0; i < player_board.length; ++i) {
-                for (var j = 0; j < player_board.length; ++j) {
-                    color = colors[parseInt(player_board[i][j])];
-                    $('#id_playerfield_' + i + '_' + j).css('background-color', color);
+            function populate(board, owner) {
+                for(var i = 0; i < board.length; ++i) {
+                    for (var j = 0; j < board.length; ++j) {
+                        color = colors[parseInt(board[i][j])];
+                        $('#id_' + owner + 'field_' + i + '_' + j).css('background-color', color);
+                    }
                 }
             }
+
+            populate(player_board, 'player');
+            populate(ai_board, 'ai');
+
+            // set up the log
 
             function log_ai(state) { log(state, 'Opponent'); }
 
