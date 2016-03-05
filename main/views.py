@@ -51,6 +51,7 @@ class GameDetailView(DetailView):
         context = super(GameDetailView, self).get_context_data(**kwargs)
         context['board_size'] = BOARD_SIZE
         context['player_board'] = self.object.player_board
+        context['ai_board'] = self.object.ai_board
         return context
 
 
@@ -70,7 +71,7 @@ def move(request):
         state = State.MISSED
         countermoves = ai_moves(game)
     elif state == State.FILLED:
-        state = State.HIT
+        state = game.hit_ai_ship(x, y)
 
     game.update_ai_board(x, y, state)
 
