@@ -40,7 +40,7 @@ class TestGameStart(BaseTestCase):
         for length, n in SHIPS.items():
             for i in range(n):
                 for j in range(length):
-                    field = self.browser.find_element_by_id('id_userfield_{}_{}'.format(line, j))
+                    field = self.browser.find_element_by_id('id_playerfield_{}_{}'.format(line, j))
                     self.assertEqual(field.value_of_css_property('background-color'), GREEN)
                 line += 1
 
@@ -92,7 +92,8 @@ class TestGameStart(BaseTestCase):
         self.browser.find_element_by_tag_name('form').submit()
 
         # She is being redirected to a page with actual game.
-        self.assertEqual(self.browser.current_url, '{}/game/1'.format(self.live_server_url))
+        pk = Game.objects.last().pk
+        self.assertEqual(self.browser.current_url, '{}/game/{}'.format(self.live_server_url, pk))
 
         # She sees her ships on her board.
         self.assert_ships_are_present()
