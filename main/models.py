@@ -16,6 +16,13 @@ SHIPS = {
 }
 
 
+class State(object):
+    EMPTY = 0
+    FILLED = 1
+    MISSED = 2
+    HIT = 3
+
+
 class Game(models.Model):
     player_board = models.CharField(max_length=FIELDS_LENGTH, blank=False, null=False)
     ai_board = models.CharField(max_length=FIELDS_LENGTH, blank=False, null=False)
@@ -23,3 +30,13 @@ class Game(models.Model):
 
     def get_absolute_url(self):
         return reverse('game_detail', kwargs={'pk': self.pk})
+
+    def update_player_board(self, x, y, state):
+        player_board = json.loads(self.player_board)
+        row = list(player_board[x])
+
+        row[y] = str(state)
+        player_board[x] = ''.join(row)
+
+        self.player_board = json.dumps(player_board)
+        self.save()
