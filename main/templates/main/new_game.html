@@ -39,23 +39,35 @@
             );
 
             $('button').click(function() {
-                $(this).css('background-color', 'green');
+                if($(this).css('background-color') != 'rgb(128, 128, 128)') {
+                    indexes = JSON.parse($(this).val());
+                    $(this).css('background-color', 'green');
 
-                indexes = JSON.parse($(this).val());
+                    position = {{ board_size }} * parseInt(indexes[0]) + parseInt(indexes[1]);
+                    tmp = $fields.val().substr(0, position) + '1' + $fields.val().substr(position + 1);
 
-                position = {{ board_size }} * parseInt(indexes[0]) + parseInt(indexes[1]);
-                tmp = $fields.val().substr(0, position) + '1' + $fields.val().substr(position+1);
-
-                $fields.val(tmp);
-
-                ships[$ships_list.val()].push(indexes);
+                    $fields.val(tmp);
+                    ships[$ships_list.val()].push(indexes);
+                }
             });
 
             // collecting ships
 
-            {% for ship in ship_list %}
-                ships.push([]);
-            {% endfor %}
+            {% for ship in ship_list %}ships.push([]);{% endfor %}
+
+            $('select').change(function() {
+                for(var i = 0; i < ships.length; ++i) {
+                    var color = 'black';
+
+                    if(i == $(this).val()) {
+                        color = 'green';
+                    }
+
+                    for(var j = 0; j < ships[i].length; ++j) {
+                        $('#id_field_' + ships[i][j][0] + '_' + ships[i][j][1]).css('background-color', color)
+                    }
+                }
+            });
 
             $('form').submit(function() {
                 $('#id_ships').val(JSON.stringify(ships));
