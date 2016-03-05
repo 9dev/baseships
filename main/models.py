@@ -31,11 +31,15 @@ class Game(models.Model):
         return reverse('game_detail', kwargs={'pk': self.pk})
 
     def update_player_board(self, x, y, state):
-        player_board = json.loads(self.player_board)
-        row = list(player_board[x])
+        self._update_board('player', x, y, state)
+
+    def _update_board(self, owner, x, y, state):
+        field_name = '{}_board'.format(owner)
+        board = json.loads(getattr(self, field_name))
+        row = list(board[x])
 
         row[y] = str(state)
-        player_board[x] = ''.join(row)
+        board[x] = ''.join(row)
 
-        self.player_board = json.dumps(player_board)
+        setattr(self, field_name, json.dumps(board))
         self.save()
