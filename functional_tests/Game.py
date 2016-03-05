@@ -149,7 +149,15 @@ class TestGamePlay(BaseTestCase):
         self.assertEqual(field.value_of_css_property('background-color'), RED)
 
         # Opponent does not perform any moves, Florence has another turn.
-        # Florence clicks on yet another box and make one of opponent's ships sink.
+        sleep(1)
+        self.assertTrue(log.text.endswith('You hit a ship!'))
+
+        # Florence clicks on yet another field and make one of opponent's ships sink.
+        field = self.get_by_id('id_aifield_1_1')
+        field.click()
+        self.assertTrue(log.text.endswith('You sunk a ship!'))
+        self.assertEqual(field.value_of_css_property('background-color'), 'blue')
+
         # Opponent's still not moving.
         # Florence clicks on a different box and misses.
         # Opponent finally performs his move(s).
