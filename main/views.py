@@ -72,6 +72,8 @@ def move(request):
     elif state == State.FILLED:
         state = State.HIT
 
+    game.update_ai_board(x, y, state)
+
     response = {
         'state': state,
         'countermoves': countermoves,

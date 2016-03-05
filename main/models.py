@@ -33,6 +33,9 @@ class Game(models.Model):
     def update_player_board(self, x, y, state):
         self._update_board('player', x, y, state)
 
+    def update_ai_board(self, x, y, state):
+        self._update_board('ai', x, y, state)
+
     def _update_board(self, owner, x, y, state):
         field_name = '{}_board'.format(owner)
         board = json.loads(getattr(self, field_name))
