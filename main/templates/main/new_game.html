@@ -8,6 +8,15 @@
     {% endif %}
 
     <form action="" method="post" id="id_board">
+        <label>
+            Select ship to build:
+            <select id="id_ships_list">
+                {% for ship in ship_list %}
+                    <option value="{{ ship }}" id="id_ship{{ forloop.counter0 }}">{{ ship }}-element ship</option>
+                {% endfor %}
+            </select>
+        </label>
+
         {% csrf_token %}
         {{ form.fields }}
 

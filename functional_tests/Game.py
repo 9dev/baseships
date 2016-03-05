@@ -1,4 +1,5 @@
 import json
+from selenium.webdriver.support.ui import Select
 from time import sleep
 
 from django.contrib.auth.models import User
@@ -27,23 +28,25 @@ class TestGameStart(BaseTestCase):
         field.click()
 
     def assert_can_create_ships(self):
-        # Florence clicks on the buttons until she creates all the ships.
         line = 0
-        for length, n in SHIPS.items():
-            for i in range(n):
-                for j in range(length):
-                    self.create_ship_part(line, j)
-                line += 1
+        ship_list = Select(self.get_by_id('id_ships_list'))
+
+        # Florence selects ship by ship and clicks on the buttons until she creates them all.
+        for ship in ship_list.options:
+            ship_list.select_by_visible_text(ship.text)
+            length, _ = ship.text.split('-element ship')
+            for i in range(int(length)):
+                self.create_ship_part(line, i)
+            line += 1
 
     def assert_ships_are_present(self):
         # Florence makes sure she sees all her ships on her board.
         line = 0
-        for length, n in SHIPS.items():
-            for i in range(n):
-                for j in range(length):
-                    field = self.browser.find_element_by_id('id_playerfield_{}_{}'.format(line, j))
-                    self.assertEqual(field.value_of_css_property('background-color'), GREEN)
-                line += 1
+        for ship in SHIPS:
+            for i in range(int(ship)):
+                field = self.browser.find_element_by_id('id_playerfield_{}_{}'.format(line, i))
+                self.assertEqual(field.value_of_css_property('background-color'), GREEN)
+            line += 1
 
     def test_cannot_start_with_too_few_ships(self):
         # Florence hits the homepage.

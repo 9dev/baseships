@@ -6,7 +6,7 @@ from django.views.generic import DetailView, FormView, TemplateView
 
 from main.ai import ai_moves
 from main.forms import NewGameForm
-from main.models import BOARD_SIZE, Game, State
+from main.models import BOARD_SIZE, Game, SHIPS, State
 
 
 class HomepageView(TemplateView):
@@ -20,6 +20,7 @@ class NewGameView(FormView):
     def get_context_data(self, **kwargs):
         context = super(NewGameView, self).get_context_data(**kwargs)
         context['board_size'] = BOARD_SIZE
+        context['ship_list'] = SHIPS
         return context
 
     def form_valid(self, form):
