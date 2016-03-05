@@ -21,4 +21,10 @@ urlpatterns = [
         views.GameDetailView.as_view(),
         name='game_detail',
     ),
+
+    url(
+        r'^move$',
+        views.move,
+        name='move',
+    ),
 ]

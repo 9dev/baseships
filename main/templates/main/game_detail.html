@@ -1,11 +1,18 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>You</h1>
+    <h2>Opponent</h2>
+    {% with board_owner='ai' %}
+        {% include 'main/snippets/board.html' %}
+    {% endwith %}
 
+    <h2>You</h2>
     {% with board_owner='user' %}
         {% include 'main/snippets/board.html' %}
     {% endwith %}
+
+    <h3>Log</h3>
+    <div id="log"></div>
 {% endblock content %}
 
 {% block body_extra %}
@@ -13,6 +20,15 @@
         $(function(){
             var color;
             var player_board = {{ player_board|safe }};
+            var $log = $('#log');
+
+            var state = {
+                EMPTY: 0,
+                FILLED: 1,
+                MISSED: 2
+            };
+
+            // populate user's board
 
             for(var i = 0; i < player_board.length; ++i) {
                 for (var j = 0; j < player_board.length; ++j) {
@@ -29,6 +45,32 @@
                     $('#id_userfield_' + i + '_' + j).css('background-color', color);
                 }
             }
+
+            // perform requested move
+
+            function move(data, button) {
+                if (data.status == state.MISSED) {
+                    button.css('background-color', 'white');
+                    $log.append('<p>You missed!</p>');
+                }
+            }
+
+            $('#board_ai').find('button').click(function() {
+                var $this = $(this);
+                var indexes = $this.val().split(",");
+
+                $.ajax({
+                    dataType: "json",
+                    method: "post",
+                    url: '/move',
+                    data: {
+                        'x': indexes[0],
+                        'y': indexes[1],
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function(data) { move(data, $this); }
+                });
+            });
         });
     </script>
 {% endblock body_extra %}

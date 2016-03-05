@@ -1,10 +1,15 @@
+import json
+
+from django.contrib.auth.models import User
+
+from main.models import BOARD_SIZE, Game, SHIPS
+
 from ._Base import BaseTestCase
 
-from main.models import SHIPS
 
-
-SILVER = 'rgba(192, 192, 192, 1)'
 GREEN = 'rgba(0, 128, 0, 1)'
+SILVER = 'rgba(192, 192, 192, 1)'
+WHITE = 'rgba(255, 255, 255, 1)'
 
 
 class TestGameStart(BaseTestCase):
@@ -94,10 +99,31 @@ class TestGameStart(BaseTestCase):
 
 class TestGamePlay(BaseTestCase):
 
+    def setUp(self):
+        super(TestGamePlay, self).setUp()
+
+        player = User.objects.get(username='admin')
+        player_board = json.dumps(['0' * BOARD_SIZE] * BOARD_SIZE)
+        ai_board = json.dumps(['0' * BOARD_SIZE] * BOARD_SIZE)
+
+        Game.objects.create(player=player, player_board=player_board, ai_board=ai_board)
+
+        # Florence logs in as an admin.
+        self.login_as_admin()
+
     def test_can_play(self):
         # Florence launches a new game.
-        # She clicks on one of the boxes on opponent's board.
+        self.get('/game/1')
+
+        # She clicks on one of the fields on opponent's board.
+        field = self.get_by_id('id_aifield_0_0')
+        field.click()
+
         # Clicked element becomes white and the log says "You missed!".
+        log = self.get_by_id("log")
+        self.assertTrue(log.text.endswith('You missed!'))
+        self.assertEqual(field.value_of_css_property('background-color'), WHITE)
+
         # Florence waits until the opponent finishes his move (or many moves if it manages to hit one of her ships).
         # She notices that at least one box on her board changed its color from silver.
         # She also notices at least one new log message.
