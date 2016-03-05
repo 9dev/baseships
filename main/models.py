@@ -48,15 +48,15 @@ class Game(models.Model):
         self.save()
 
     def hit_player_ship(self, x, y):
-        self._hit_ship('player', x, y)
+        return self._hit_ship('player', x, y)
 
     def hit_ai_ship(self, x, y):
-        self._hit_ship('ai', x, y)
+        return self._hit_ship('ai', x, y)
 
     def _hit_ship(self, owner, x, y):
         field_name = '{}_ships'.format(owner)
         ships = json.loads(getattr(self, field_name))
-        point = json.dumps([x, y])
+        point = [x, y]
         state = State.HIT
 
         for ship in ships:
