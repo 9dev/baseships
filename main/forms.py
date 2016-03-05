@@ -6,7 +6,7 @@ from main.models import BOARD_SIZE
 
 
 class NewGameForm(forms.Form):
-    fields = forms.CharField(max_length=BOARD_SIZE**2,min_length=BOARD_SIZE**2, widget=forms.HiddenInput(), label="Board")
+    fields = forms.CharField(max_length=BOARD_SIZE**2, min_length=BOARD_SIZE**2, widget=forms.HiddenInput(), label="Board")
 
     def clean_fields(self):
         fields = self.cleaned_data['fields']
