@@ -25,13 +25,10 @@ class NewGameView(FormView):
 
     def form_valid(self, form):
         player_board = json.dumps(form.cleaned_data['fields'])
-
-        x = ['0' * BOARD_SIZE] * BOARD_SIZE
-        x[1] = '1111111111'
-        ai_board = json.dumps(x)
+        ai_board = json.dumps(form.cleaned_data['fields'])
 
         player_ships = json.dumps(form.cleaned_data['ships'])
-        ai_ships = json.dumps('')
+        ai_ships = json.dumps(form.cleaned_data['ships'])
 
         game = Game.objects.create(
             player=self.request.user,
