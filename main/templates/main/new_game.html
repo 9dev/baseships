@@ -12,13 +12,14 @@
             Select ship to build:
             <select id="id_ships_list">
                 {% for ship in ship_list %}
-                    <option value="{{ ship }}" id="id_ship{{ forloop.counter0 }}">{{ ship }}-element ship</option>
+                    <option value="{{ forloop.counter0 }}">{{ ship }}-element ship</option>
                 {% endfor %}
             </select>
         </label>
 
         {% csrf_token %}
         {{ form.fields }}
+        {{ form.ships }}
 
         {% include 'main/snippets/board.html' %}
         <input type="submit" value="START">
@@ -30,6 +31,8 @@
         $(function(){
             var tmp, indexes, position;
             var $fields = $('#id_fields');
+            var $ships_list = $('#id_ships_list');
+            var ships = [];
 
             $fields.val(
                 new Array({{ board_size }} * {{ board_size }} + 1).join('0')
@@ -38,11 +41,24 @@
             $('button').click(function() {
                 $(this).css('background-color', 'green');
 
-                indexes = $(this).val().split(',');
+                indexes = JSON.parse($(this).val());
+
                 position = {{ board_size }} * parseInt(indexes[0]) + parseInt(indexes[1]);
                 tmp = $fields.val().substr(0, position) + '1' + $fields.val().substr(position+1);
 
                 $fields.val(tmp);
+
+                ships[$ships_list.val()].push(indexes);
+            });
+
+            // collecting ships
+
+            {% for ship in ship_list %}
+                ships.push([]);
+            {% endfor %}
+
+            $('form').submit(function() {
+                $('#id_ships').val(JSON.stringify(ships));
             });
         });
     </script>

@@ -30,7 +30,17 @@ class NewGameView(FormView):
         x[1] = '1111111111'
         ai_board = json.dumps(x)
 
-        game = Game.objects.create(player=self.request.user, player_board=player_board, ai_board=ai_board)
+        player_ships = json.dumps(form.cleaned_data['ships'])
+        ai_ships = json.dumps('')
+
+        game = Game.objects.create(
+            player=self.request.user,
+            player_board=player_board,
+            ai_board=ai_board,
+            player_ships=player_ships,
+            ai_ships=ai_ships,
+        )
+
         return HttpResponseRedirect(game.get_absolute_url())
 
 

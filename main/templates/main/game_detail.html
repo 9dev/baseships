@@ -80,7 +80,7 @@
 
             $('#board_ai').find('button').click(function() {
                 var $this = $(this);
-                var indexes = $this.val().split(",");
+                var indexes = JSON.parse($this.val());
 
                 $.ajax({
                     dataType: "json",
