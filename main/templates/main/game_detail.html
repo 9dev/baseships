@@ -67,9 +67,7 @@
             }
 
             function move(data, button) {
-                if (data.state == states.MISSED) {
-                    button.css('background-color', 'white');
-                }
+                button.css('background-color', colors[data.state]);
                 log_player(data.state);
 
                 setTimeout(function() {

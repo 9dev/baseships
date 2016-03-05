@@ -24,7 +24,11 @@ class NewGameView(FormView):
 
     def form_valid(self, form):
         player_board = json.dumps(form.cleaned_data['fields'])
-        ai_board = json.dumps(['0' * BOARD_SIZE] * BOARD_SIZE)
+
+        x = ['0' * BOARD_SIZE] * BOARD_SIZE
+        x[1] = '1111111111'
+        ai_board = json.dumps(x)
+
         game = Game.objects.create(player=self.request.user, player_board=player_board, ai_board=ai_board)
         return HttpResponseRedirect(game.get_absolute_url())
 
@@ -49,13 +53,17 @@ def move(request):
 
     game = get_list_or_404(Game, player=request.user)[0]
     state = int(json.loads(game.ai_board)[x][y])
+    countermoves = []
 
     if state == State.EMPTY:
         state = State.MISSED
+        countermoves = ai_moves(game)
+    elif state == State.FILLED:
+        state = State.HIT
 
     response = {
         'state': state,
-        'countermoves': ai_moves(game),
+        'countermoves': countermoves,
     }
 
     return HttpResponse(json.dumps(response))

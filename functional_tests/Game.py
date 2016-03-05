@@ -11,6 +11,7 @@ from ._Base import BaseTestCase
 GREEN = 'rgba(0, 128, 0, 1)'
 SILVER = 'rgba(192, 192, 192, 1)'
 WHITE = 'rgba(255, 255, 255, 1)'
+RED = 'rgba(255, 0, 0, 1)'
 
 
 class TestGameStart(BaseTestCase):
@@ -106,7 +107,10 @@ class TestGamePlay(BaseTestCase):
 
         player = User.objects.get(username='admin')
         player_board = json.dumps(['0' * BOARD_SIZE] * BOARD_SIZE)
-        ai_board = json.dumps(['0' * BOARD_SIZE] * BOARD_SIZE)
+
+        x = ['0' * BOARD_SIZE] * BOARD_SIZE
+        x[1] = '1111111111'
+        ai_board = json.dumps(x)
 
         Game.objects.create(player=player, player_board=player_board, ai_board=ai_board)
 
@@ -136,8 +140,14 @@ class TestGamePlay(BaseTestCase):
         # She also notices at least one new log message.
         self.assertTrue(log.text.endswith('Opponent missed!'))
 
-        # She clicks on another box on opponent's board.
+        # She clicks on another field on opponent's board.
+        field = self.get_by_id('id_aifield_1_0')
+        field.click()
+
         # Clicked element becomes red and the log says "You hit a ship!"
+        self.assertTrue(log.text.endswith('You hit a ship!'))
+        self.assertEqual(field.value_of_css_property('background-color'), RED)
+
         # Opponent does not perform any moves, Florence has another turn.
         # Florence clicks on yet another box and make one of opponent's ships sink.
         # Opponent's still not moving.

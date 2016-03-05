@@ -21,6 +21,7 @@ class State(object):
     FILLED = 1
     MISSED = 2
     HIT = 3
+    SUNK = 4
 
 
 class Game(models.Model):
