@@ -46,3 +46,26 @@ class Game(models.Model):
 
         setattr(self, field_name, json.dumps(board))
         self.save()
+
+    def hit_player_ship(self, x, y):
+        self._hit_ship('player', x, y)
+
+    def hit_ai_ship(self, x, y):
+        self._hit_ship('ai', x, y)
+
+    def _hit_ship(self, owner, x, y):
+        field_name = '{}_ships'.format(owner)
+        ships = json.loads(getattr(self, field_name))
+        point = json.dumps([x, y])
+        state = State.HIT
+
+        for ship in ships:
+            if point in ship:
+                if len(ship) == 1:
+                    state = State.SUNK
+                ship.remove(point)
+                break
+
+        setattr(self, field_name, json.dumps(ships))
+        self.save()
+        return state
