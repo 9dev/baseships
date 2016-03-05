@@ -7,7 +7,7 @@
     {% endwith %}
 
     <h2>You</h2>
-    {% with board_owner='user' %}
+    {% with board_owner='player' %}
         {% include 'main/snippets/board.html' %}
     {% endwith %}
 
@@ -22,37 +22,62 @@
             var player_board = {{ player_board|safe }};
             var $log = $('#log');
 
-            var state = {
+            var states = {
                 EMPTY: 0,
                 FILLED: 1,
-                MISSED: 2
+                MISSED: 2,
+                HIT: 3
+            };
+
+            var colors = {
+                0: 'silver',
+                1: 'green',
+                2: 'white',
+                3: 'red'
+            };
+
+            var messages = {
+                2: 'missed',
+                3: 'hit a ship'
             };
 
             // populate user's board
 
             for(var i = 0; i < player_board.length; ++i) {
                 for (var j = 0; j < player_board.length; ++j) {
-                    switch(player_board[i][j])
-                    {
-                        case '1':
-                            color = 'green';
-                            break;
-                        case '0':
-                        default:
-                            color = 'silver';
-                            break;
-                    }
-                    $('#id_userfield_' + i + '_' + j).css('background-color', color);
+                    color = colors[parseInt(player_board[i][j])];
+                    $('#id_playerfield_' + i + '_' + j).css('background-color', color);
                 }
+            }
+
+            function log_ai(state) { log(state, 'Opponent'); }
+
+            function log_player(state) { log(state, 'You'); }
+
+            function log(state, user) {
+                $log.append('<p>' + user + ' ' + messages[state] + '!</p>');
             }
 
             // perform requested move
 
+            function ai_move(cm) {
+                color = colors[parseInt(cm.state)];
+                $('#id_playerfield_' + cm.x + '_' + cm.y).css('background-color', color);
+                log_ai(parseInt(cm.state));
+            }
+
             function move(data, button) {
-                if (data.status == state.MISSED) {
+                if (data.state == states.MISSED) {
                     button.css('background-color', 'white');
-                    $log.append('<p>You missed!</p>');
                 }
+                log_player(data.state);
+
+                setTimeout(function() {
+                    for(var i = 0; i < data.countermoves.length; ++i) {
+                        var cm = data.countermoves[i];
+                        ai_move(cm);
+                    }
+                }, 300);
             }
 
             $('#board_ai').find('button').click(function() {

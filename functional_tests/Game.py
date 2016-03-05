@@ -1,4 +1,5 @@
 import json
+from time import sleep
 
 from django.contrib.auth.models import User
 
@@ -125,8 +126,15 @@ class TestGamePlay(BaseTestCase):
         self.assertEqual(field.value_of_css_property('background-color'), WHITE)
 
         # Florence waits until the opponent finishes his move (or many moves if it manages to hit one of her ships).
-        # She notices that at least one box on her board changed its color from silver.
+        sleep(2)
+
+        # She notices that at least one box on her board changed its color from silver to white.
+        fields = self.browser.find_elements_by_css_selector('#board_player button')
+        self.assertTrue(any(f.value_of_css_property('background-color') == WHITE for f in fields))
+
         # She also notices at least one new log message.
+        self.assertTrue(log.text.endswith('Opponent missed!'))
+
         # She clicks on another box on opponent's board.
         # Clicked element becomes red and the log says "You hit a ship!"
         # Opponent does not perform any moves, Florence has another turn.

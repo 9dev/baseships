@@ -4,14 +4,9 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_list_or_404
 from django.views.generic import DetailView, FormView, TemplateView
 
+from main.ai import ai_moves
 from main.forms import NewGameForm
-from main.models import BOARD_SIZE, Game
-
-
-class State(object):
-    EMPTY = 0
-    FILLED = 1
-    MISSED = 2
+from main.models import BOARD_SIZE, Game, State
 
 
 class HomepageView(TemplateView):
@@ -28,7 +23,7 @@ class NewGameView(FormView):
         return context
 
     def form_valid(self, form):
-        player_board = form.cleaned_data['fields']
+        player_board = json.dumps(form.cleaned_data['fields'])
         ai_board = json.dumps(['0' * BOARD_SIZE] * BOARD_SIZE)
         game = Game.objects.create(player=self.request.user, player_board=player_board, ai_board=ai_board)
         return HttpResponseRedirect(game.get_absolute_url())
@@ -53,13 +48,14 @@ def move(request):
         return HttpResponse('')
 
     game = get_list_or_404(Game, player=request.user)[0]
-    field = int(json.loads(game.ai_board)[x][y])
+    state = int(json.loads(game.ai_board)[x][y])
 
-    if field == State.EMPTY:
-        field = State.MISSED
+    if state == State.EMPTY:
+        state = State.MISSED
 
     response = {
-        'status': field,
+        'state': state,
+        'countermoves': ai_moves(game),
     }
 
     return HttpResponse(json.dumps(response))
