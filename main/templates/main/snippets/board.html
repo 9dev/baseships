@@ -1,8 +1,12 @@
-{% for i in "x"|rjust:board_size %}
-    {% for j in "x"|rjust:board_size %}
-        <button type="button"
-                id="id_{{ board_owner }}field_{{ forloop.parentloop.counter0 }}_{{ forloop.counter0 }}"
-                value="{{ forloop.parentloop.counter0 }},{{ forloop.counter0 }}">
-        </button>
+<div class="board">
+    {% for i in "x"|rjust:board_size %}
+        <div class="board_row">
+            {% for j in "x"|rjust:board_size %}
+                <button type="button"
+                        id="id_{{ board_owner }}field_{{ forloop.parentloop.counter0 }}_{{ forloop.counter0 }}"
+                        value="{{ forloop.parentloop.counter0 }},{{ forloop.counter0 }}">
+                </button>
+            {% endfor %}
+        </div>
     {% endfor %}
-{% endfor %}
+</div>
