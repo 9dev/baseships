@@ -33,7 +33,7 @@ class TestGameStart(BaseTestCase):
 
         # Florence selects ship by ship and clicks on the buttons until she creates them all.
         for ship in ship_list.options:
-            ship_list.select_by_visible_text(ship.text)
+            ship_list.select_by_value(str(line))
             length, _ = ship.text.split('-element ship')
             for i in range(int(length)):
                 self.create_ship_part(line, i)
