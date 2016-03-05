@@ -21,6 +21,10 @@ class State(object):
 class Game(models.Model):
     player_board = models.CharField(max_length=FIELDS_LENGTH, blank=False, null=False)
     ai_board = models.CharField(max_length=FIELDS_LENGTH, blank=False, null=False)
+
+    player_ships = models.CharField(max_length=FIELDS_LENGTH*2, blank=False, null=False)
+    ai_ships = models.CharField(max_length=FIELDS_LENGTH*2, blank=False, null=False)
+
     player = models.ForeignKey('auth.User')
 
     def get_absolute_url(self):
