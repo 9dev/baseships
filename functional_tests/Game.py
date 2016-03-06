@@ -4,15 +4,16 @@ from time import sleep
 
 from django.contrib.auth.models import User
 
-from main.models import BOARD_SIZE, Game, SHIPS
+from main.models import BOARD_SIZE, Game, SHIPS, State
 
 from ._Base import BaseTestCase
 
 
+BLUE = 'rgba(0, 0, 255, 1)'
 GREEN = 'rgba(0, 128, 0, 1)'
+RED = 'rgba(255, 0, 0, 1)'
 SILVER = 'rgba(192, 192, 192, 1)'
 WHITE = 'rgba(255, 255, 255, 1)'
-RED = 'rgba(255, 0, 0, 1)'
 
 
 class TestGameStart(BaseTestCase):
@@ -109,13 +110,20 @@ class TestGamePlay(BaseTestCase):
         super(TestGamePlay, self).setUp()
 
         player = User.objects.get(username='admin')
-        player_board = json.dumps(['0' * BOARD_SIZE] * BOARD_SIZE)
 
-        x = ['0' * BOARD_SIZE] * BOARD_SIZE
-        x[1] = '1111111111'
-        ai_board = json.dumps(x)
+        board = ['0' * BOARD_SIZE] * BOARD_SIZE
+        ships = []
 
-        Game.objects.create(player=player, player_board=player_board, ai_board=ai_board)
+        for line, ship in enumerate(SHIPS):
+            parts = int(ship)
+            board[line] = str(State.FILLED) * parts + board[line][parts:]
+            ships.append([])
+
+            for part in range(parts):
+                ships[line].append([line, part])
+
+        board, ships = json.dumps(board), json.dumps(ships)
+        Game.objects.create(player=player, player_board=board, ai_board=board, player_ships=ships, ai_ships=ships)
 
         # Florence logs in as an admin.
         self.login_as_admin()
@@ -125,7 +133,7 @@ class TestGamePlay(BaseTestCase):
         self.get('/game/1')
 
         # She clicks on one of the fields on opponent's board.
-        field = self.get_by_id('id_aifield_0_0')
+        field = self.get_by_id('id_aifield_9_9')
         field.click()
 
         # Clicked element becomes white and the log says "You missed!".
@@ -134,7 +142,7 @@ class TestGamePlay(BaseTestCase):
         self.assertEqual(field.value_of_css_property('background-color'), WHITE)
 
         # Florence waits until the opponent finishes his move (or many moves if it manages to hit one of her ships).
-        sleep(2)
+        sleep(5)
 
         # She notices that at least one box on her board changed its color from silver to white.
         fields = self.browser.find_elements_by_css_selector('#board_player button')
@@ -144,22 +152,26 @@ class TestGamePlay(BaseTestCase):
         self.assertTrue(log.text.endswith('Opponent missed!'))
 
         # She clicks on another field on opponent's board.
-        field = self.get_by_id('id_aifield_1_0')
+        field = self.get_by_id('id_aifield_4_0')
         field.click()
 
         # Clicked element becomes red and the log says "You hit a ship!"
+        sleep(2)
         self.assertTrue(log.text.endswith('You hit a ship!'))
         self.assertEqual(field.value_of_css_property('background-color'), RED)
 
         # Opponent does not perform any moves, Florence has another turn.
-        sleep(1)
+        sleep(2)
         self.assertTrue(log.text.endswith('You hit a ship!'))
 
         # Florence clicks on yet another field and make one of opponent's ships sink.
-        field = self.get_by_id('id_aifield_1_1')
-        field.click()
+        field2 = self.get_by_id('id_aifield_4_1')
+        field2.click()
+        sleep(2)
+
         self.assertTrue(log.text.endswith('You sunk a ship!'))
-        self.assertEqual(field.value_of_css_property('background-color'), 'blue')
+        self.assertEqual(field.value_of_css_property('background-color'), BLUE)
+        self.assertEqual(field2.value_of_css_property('background-color'), BLUE)
 
         # Opponent's still not moving.
         # Florence clicks on a different box and misses.

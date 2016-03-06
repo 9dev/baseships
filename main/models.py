@@ -58,16 +58,22 @@ class Game(models.Model):
         ships = json.loads(getattr(self, ships_field_name))
         board = json.loads(getattr(self, board_field_name))
         point = [x, y]
+        sunk = []
         state = State.HIT
 
         for ship in ships:
             if point in ship:
                 if all(int(board[i][j]) == State.HIT for (i, j) in ship if [i, j] != point):
                     state = State.SUNK
+                    sunk = ship
+
+                    for x, y in ship:
+                        if [x, y] != point:
+                            self._update_board(owner, x, y, state)
                 break
 
         setattr(self, ships_field_name, json.dumps(ships))
         self.save()
         self._update_board(owner, x, y, state)
 
-        return state
+        return state, sunk

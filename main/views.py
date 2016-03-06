@@ -62,19 +62,21 @@ def move(request):
 
     game = get_list_or_404(Game, player=request.user)[0]
     state = int(json.loads(game.ai_board)[x][y])
-    countermoves = []
+    countermoves, ai_sunk, player_sunk = [], [], []
 
     if state == State.EMPTY:
         state = State.MISSED
-        countermoves = ai_moves(game)
+        countermoves, player_sunk = ai_moves(game)
     elif state == State.FILLED:
-        state = game.hit_ai_ship(x, y)
+        state, ai_sunk = game.hit_ai_ship(x, y)
 
     game.update_ai_board(x, y, state)
 
     response = {
         'state': state,
         'countermoves': countermoves,
+        'ai_sunk': ai_sunk,
+        'player_sunk': player_sunk,
     }
 
     return HttpResponse(json.dumps(response))
