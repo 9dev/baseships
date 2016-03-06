@@ -201,10 +201,10 @@ class TestGameOver(BaseTestCase):
         super(TestGameOver, self).setUp()
 
         self.game = create_new_game(finished=True)
-        self.game.update_player_board(6, 0, State.FILLED)
         self.game.update_ai_board(6, 0, State.FILLED)
 
     def test_can_lose(self):
+        self.game.update_player_board(6, 0, State.FILLED)
         self.game.update_ai_board(9, 9, State.EMPTY)
 
         # Florence is logged in as an admin.
@@ -224,5 +224,24 @@ class TestGameOver(BaseTestCase):
         sleep(5)
         self.assertTrue(log.text.endswith('Opponent sunk a ship!'))
 
-        # Florence sees a big header "YOU LOSE!".
+        # Florence sees a big header "You lose!".
         self.assertEqual(self.get_by_id('id_game_over').text, "You lose!")
+
+    def test_can_win(self):
+        self.game.player_board = self.game.player_board.replace(str(State.SUNK), str(State.FILLED))
+        self.game.save()
+
+        # Florence is logged in as an admin.
+        self.login_as_admin()
+
+        # She is nearly at the end of the game.
+        self.get('/game/{}'.format(self.game.pk))
+
+        # She performs a move and makes opponent's last ship sunk.
+        field = self.get_by_id('id_aifield_6_0')
+        field.click()
+        sleep(2)
+        self.assertEqual(field.value_of_css_property('background-color'), BLUE)
+
+        # Florence sees a big header "You win!".
+        self.assertEqual(self.get_by_id('id_game_over').text, "You win!")
