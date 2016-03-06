@@ -24,6 +24,8 @@ Classic battleship game as a web application written in Python and Django. Proje
 
 - Navigate to `http://127.0.0.1:8000`.
 
+- When asked to log in, use credentials `admin : admin`.
+
 ## Tests
 
 Project comes with a full suite of functional tests. You can run all of them by executing:
