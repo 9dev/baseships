@@ -3,7 +3,7 @@ import json
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import get_list_or_404
+from django.shortcuts import get_list_or_404, redirect
 from django.utils.decorators import method_decorator
 from django.views.generic import DetailView, FormView, TemplateView
 
@@ -45,6 +45,12 @@ class NewGameView(FormView):
     def dispatch(self, request, *args, **kwargs):
         return super(NewGameView, self).dispatch(request, *args, **kwargs)
 
+    def get(self, request, *args, **kwargs):
+        games = Game.objects.filter(player=request.user)
+        if games.count() > 0:
+            return redirect(games[0].get_absolute_url())
+        return super(NewGameView, self).get(request, *args, **kwargs)
+
 
 class GameDetailView(DetailView):
     model = Game
@@ -83,12 +89,16 @@ def move(request):
 
     game.update_ai_board(x, y, state)
 
+    game_over = game.game_over()
+    if game_over:
+        game.delete()
+
     response = {
         'state': state,
         'countermoves': countermoves,
         'ai_sunk': ai_sunk,
         'player_sunk': player_sunk,
-        'game_over': game.game_over(),
+        'game_over': game_over,
     }
 
     return HttpResponse(json.dumps(response))
