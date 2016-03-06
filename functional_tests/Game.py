@@ -127,17 +127,14 @@ class TestGameStart(BaseTestCase):
 
 class TestGamePlay(BaseTestCase):
 
-    def setUp(self):
-        super(TestGamePlay, self).setUp()
-
-        create_new_game()
-
     def test_can_play(self):
+        game = create_new_game()
+
         # Florence logs in as an admin.
         self.login_as_admin()
 
         # Florence launches a new game.
-        self.get('/game/1')
+        self.get('/game/{}'.format(game.pk))
 
         # She clicks on one of the fields on opponent's board.
         field = self.get_by_id('id_aifield_9_9')
