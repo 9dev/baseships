@@ -24,6 +24,7 @@
             var player_board = {{ player_board|safe }};
             var ai_board = {{ ai_board|safe }};
             var $log = $('#log');
+            var buttons_active = true;
 
             var colors = {
                 0: 'silver',
@@ -73,31 +74,38 @@
             }
 
             function move(data, button) {
-                var i;
-                button.css('background-color', colors[data.state]);
-                log_player(data.state);
+                if(buttons_active && button.css('background-color') == 'rgb(192, 192, 192)') {
+                    var i;
+                    button.css('background-color', colors[data.state]);
+                    log_player(data.state);
 
-                for(i = 0; i < data.ai_sunk.length; ++i) {
-                    $('#id_aifield_' + data.ai_sunk[i][0] + '_' + data.ai_sunk[i][1]).css('background-color', colors[4]);
+                    for (i = 0; i < data.ai_sunk.length; ++i) {
+                        $('#id_aifield_' + data.ai_sunk[i][0] + '_' + data.ai_sunk[i][1]).css('background-color', colors[4]);
+                    }
+
+                    for (i = 0; i < data.player_sunk.length; ++i) {
+                        $('#id_playerfield_' + data.player_sunk[i][0] + '_' + data.player_sunk[i][1]).css('background-color', colors[4]);
+                    }
+
+                    buttons_active = false;
+
+                    setTimeout(function () {
+                        for (var i = 0; i < data.countermoves.length; ++i) {
+                            var cm = data.countermoves[i];
+                            ai_move(cm);
+                        }
+
+                        if (data.game_over == '1') {
+                            $('#id_game_over').show().html('You win!');
+                        }
+                        else if (data.game_over == '-1') {
+                            $('#id_game_over').show().html('You lose!');
+                        }
+                        else {
+                            buttons_active = true;
+                        }
+                    }, 500);
                 }
-
-                for(i = 0; i < data.player_sunk.length; ++i) {
-                    $('#id_playerfield_' + data.player_sunk[i][0] + '_' + data.player_sunk[i][1]).css('background-color', colors[4]);
-                }
-
-                setTimeout(function() {
-                    for(var i = 0; i < data.countermoves.length; ++i) {
-                        var cm = data.countermoves[i];
-                        ai_move(cm);
-                    }
-
-                    if(data.game_over == '1') {
-                        $('#id_game_over').show().html('You win!');
-                    }
-                    else if(data.game_over == '-1') {
-                        $('#id_game_over').show().html('You lose!');
-                    }
-                }, 500);
             }
 
             $('#board_ai').find('button').click(function() {
