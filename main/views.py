@@ -1,7 +1,10 @@
 import json
 
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_list_or_404
+from django.utils.decorators import method_decorator
 from django.views.generic import DetailView, FormView, TemplateView
 
 from main.ai import ai_moves
@@ -40,6 +43,10 @@ class NewGameView(FormView):
 
         return HttpResponseRedirect(game.get_absolute_url())
 
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super(NewGameView, self).dispatch(request, *args, **kwargs)
+
 
 class GameDetailView(DetailView):
     model = Game
@@ -51,6 +58,12 @@ class GameDetailView(DetailView):
         context['ai_board'] = self.object.ai_board.replace(str(State.FILLED), str(State.EMPTY))
         return context
 
+    def get_object(self, queryset=None):
+        obj = super(GameDetailView, self).get_object(queryset)
+        if obj.player != self.request.user:
+            raise PermissionDenied
+        return obj
+
 
 def move(request):
     x, y = request.POST.get('x', '0'), request.POST.get('y', '0')
@@ -58,7 +71,7 @@ def move(request):
     try:
         x, y = int(x), int(y)
     except (ValueError, IndexError):
-        return HttpResponse('')
+        return HttpResponse('Illegal move!')
 
     game = get_list_or_404(Game, player=request.user.pk)[0]
     state = int(json.loads(game.ai_board)[x][y])
