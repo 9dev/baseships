@@ -39,7 +39,17 @@ def ai_moves(game):
     return moves, sunk
 
 
-def is_empty(board, x, y):
+def ai_init():
+    board = [str(State.EMPTY) * BOARD_SIZE] * BOARD_SIZE
+    ships = []
+
+    for ship in SHIPS:
+        ships.append(_place_ship(board, ship))
+
+    return json.dumps(board), json.dumps(ships)
+
+
+def _is_empty(board, x, y):
     if x < 0 or y < 0:
         return False
 
@@ -50,14 +60,14 @@ def is_empty(board, x, y):
         return False
 
 
-def build_ship(board, x, y, n, dx, dy):
+def _build_ship(board, x, y, n, dx, dy):
     ship = []
 
     for k in range(n):
         xx = k * dx + x
         yy = k * dy + y
 
-        if is_empty(board, xx, yy):
+        if _is_empty(board, xx, yy):
             ship.append([xx, yy])
         else:
             return False
@@ -65,26 +75,16 @@ def build_ship(board, x, y, n, dx, dy):
     return ship
 
 
-def place_ship(board, n):
+def _place_ship(board, n):
     neighbours = ((-1, 0), (1, 0), (0, -1), (0, 1))
 
     while True:
         x, y = randint(0, BOARD_SIZE-1), randint(0, BOARD_SIZE-1)
 
-        if is_empty(board, x, y):
+        if _is_empty(board, x, y):
             for dx, dy in neighbours:
-                ship = build_ship(board, x, y, n, dx, dy)
+                ship = _build_ship(board, x, y, n, dx, dy)
                 if ship:
                     for xx, yy in ship:
                         board[xx] = board[xx][:yy-1] + str(State.FILLED) + board[xx][yy:]
                     return ship
-
-
-def ai_init():
-    board = [str(State.EMPTY) * BOARD_SIZE] * BOARD_SIZE
-    ships = []
-
-    for ship in SHIPS:
-        ships.append(place_ship(board, ship))
-
-    return json.dumps(board), json.dumps(ships)
