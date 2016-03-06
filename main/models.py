@@ -6,7 +6,6 @@ from django.db import models
 
 BOARD_SIZE = 10
 FIELDS_LENGTH = len(json.dumps([[0] * BOARD_SIZE] * BOARD_SIZE))
-
 SHIPS = [5, 4, 3, 2, 2, 1, 1]
 
 
@@ -36,6 +35,12 @@ class Game(models.Model):
     def update_ai_board(self, x, y, state):
         self._update_board('ai', x, y, state)
 
+    def hit_player_ship(self, x, y):
+        return self._hit_ship('player', x, y)
+
+    def hit_ai_ship(self, x, y):
+        return self._hit_ship('ai', x, y)
+
     def _update_board(self, owner, x, y, state):
         field_name = '{}_board'.format(owner)
         board = json.loads(getattr(self, field_name))
@@ -46,12 +51,6 @@ class Game(models.Model):
 
         setattr(self, field_name, json.dumps(board))
         self.save()
-
-    def hit_player_ship(self, x, y):
-        return self._hit_ship('player', x, y)
-
-    def hit_ai_ship(self, x, y):
-        return self._hit_ship('ai', x, y)
 
     def _hit_ship(self, owner, x, y):
         field_name = '{}_ships'.format(owner)
