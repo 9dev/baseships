@@ -42,13 +42,12 @@ class Game(models.Model):
         return self._hit_ship('ai', x, y)
 
     def game_over(self):
-        empty = str(State.EMPTY)
         filled = str(State.FILLED)
 
-        if empty not in self.player_board and filled not in self.player_board:
-            return -1
-        elif empty not in self.ai_board and filled not in self.ai_board:
-            return 1
+        if filled not in ''.join(json.loads(self.player_board)):
+            return 'D'
+        elif filled not in ''.join(json.loads(self.ai_board)):
+            return 'V'
 
         return False
 
