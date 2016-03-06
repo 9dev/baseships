@@ -28,6 +28,11 @@ def testf(target):
         _django('test functional_tests.{} -v 2'.format(target))
 
 
+def test():
+    with _venv():
+        _django('test functional_tests --pattern="*" -v 2')
+
+
 def _django(command):
     return local('python manage.py {}'.format(command))
 
