@@ -16,6 +16,24 @@ SILVER = 'rgba(192, 192, 192, 1)'
 WHITE = 'rgba(255, 255, 255, 1)'
 
 
+def create_new_game():
+    player = User.objects.get(username='admin')
+
+    board = ['0' * BOARD_SIZE] * BOARD_SIZE
+    ships = []
+
+    for line, ship in enumerate(SHIPS):
+        parts = int(ship)
+        board[line] = str(State.FILLED) * parts + board[line][parts:]
+        ships.append([])
+
+        for part in range(parts):
+            ships[line].append([line, part])
+
+    board, ships = json.dumps(board), json.dumps(ships)
+    Game.objects.create(player=player, player_board=board, ai_board=board, player_ships=ships, ai_ships=ships)
+
+
 class TestGameStart(BaseTestCase):
 
     def setUp(self):
@@ -109,26 +127,12 @@ class TestGamePlay(BaseTestCase):
     def setUp(self):
         super(TestGamePlay, self).setUp()
 
-        player = User.objects.get(username='admin')
+        create_new_game()
 
-        board = ['0' * BOARD_SIZE] * BOARD_SIZE
-        ships = []
-
-        for line, ship in enumerate(SHIPS):
-            parts = int(ship)
-            board[line] = str(State.FILLED) * parts + board[line][parts:]
-            ships.append([])
-
-            for part in range(parts):
-                ships[line].append([line, part])
-
-        board, ships = json.dumps(board), json.dumps(ships)
-        Game.objects.create(player=player, player_board=board, ai_board=board, player_ships=ships, ai_ships=ships)
-
+    def test_can_play(self):
         # Florence logs in as an admin.
         self.login_as_admin()
 
-    def test_can_play(self):
         # Florence launches a new game.
         self.get('/game/1')
 
