@@ -48,7 +48,7 @@ class GameDetailView(DetailView):
         context = super(GameDetailView, self).get_context_data(**kwargs)
         context['board_size'] = BOARD_SIZE
         context['player_board'] = self.object.player_board
-        context['ai_board'] = self.object.ai_board
+        context['ai_board'] = self.object.ai_board.replace(str(State.FILLED), str(State.EMPTY))
         return context
 
 
@@ -60,7 +60,7 @@ def move(request):
     except (ValueError, IndexError):
         return HttpResponse('')
 
-    game = get_list_or_404(Game, player=request.user)[0]
+    game = get_list_or_404(Game, player=request.user.pk)[0]
     state = int(json.loads(game.ai_board)[x][y])
     countermoves, ai_sunk, player_sunk = [], [], []
 
@@ -77,6 +77,7 @@ def move(request):
         'countermoves': countermoves,
         'ai_sunk': ai_sunk,
         'player_sunk': player_sunk,
+        'game_over': game.game_over(),
     }
 
     return HttpResponse(json.dumps(response))

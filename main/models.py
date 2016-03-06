@@ -41,6 +41,17 @@ class Game(models.Model):
     def hit_ai_ship(self, x, y):
         return self._hit_ship('ai', x, y)
 
+    def game_over(self):
+        empty = str(State.EMPTY)
+        filled = str(State.FILLED)
+
+        if empty not in self.player_board and filled not in self.player_board:
+            return -1
+        elif empty not in self.ai_board and filled not in self.ai_board:
+            return 1
+
+        return False
+
     def _update_board(self, owner, x, y, state):
         field_name = '{}_board'.format(owner)
         board = json.loads(getattr(self, field_name))

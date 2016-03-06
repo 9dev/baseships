@@ -9,7 +9,7 @@ def ai_move(game):
     state = State.MISSED
     sunk = []
 
-    while state == State.MISSED or state == State.HIT:
+    while state == State.MISSED or state == State.HIT or state == State.SUNK:
         x, y = randint(0, BOARD_SIZE-1), randint(0, BOARD_SIZE-1)
         state = int(player_board[x][y])
 
@@ -26,6 +26,9 @@ def ai_moves(game):
     moves, sunk = [], []
 
     while True:
+        if game.game_over():
+            break
+
         move, sunk_ = ai_move(game)
         moves.append(move)
         sunk += sunk_

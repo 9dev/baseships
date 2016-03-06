@@ -16,22 +16,25 @@ SILVER = 'rgba(192, 192, 192, 1)'
 WHITE = 'rgba(255, 255, 255, 1)'
 
 
-def create_new_game():
+def create_new_game(finished=False):
     player = User.objects.get(username='admin')
 
-    board = ['0' * BOARD_SIZE] * BOARD_SIZE
+    ship_state = str(State.SUNK if finished else State.FILLED)
+    empty_state = str(State.MISSED if finished else State.EMPTY)
+
+    board = [empty_state * BOARD_SIZE] * BOARD_SIZE
     ships = []
 
     for line, ship in enumerate(SHIPS):
         parts = int(ship)
-        board[line] = str(State.FILLED) * parts + board[line][parts:]
+        board[line] = ship_state * parts + board[line][parts:]
         ships.append([])
 
         for part in range(parts):
             ships[line].append([line, part])
 
     board, ships = json.dumps(board), json.dumps(ships)
-    Game.objects.create(player=player, player_board=board, ai_board=board, player_ships=ships, ai_ships=ships)
+    return Game.objects.create(player=player, player_board=board, ai_board=board, player_ships=ships, ai_ships=ships)
 
 
 class TestGameStart(BaseTestCase):
@@ -190,3 +193,36 @@ class TestGamePlay(BaseTestCase):
         # Opponent finally performs his move(s).
         sleep(5)
         self.assertTrue(log.text.endswith('Opponent missed!'))
+
+
+class TestGameOver(BaseTestCase):
+
+    def setUp(self):
+        super(TestGameOver, self).setUp()
+
+        self.game = create_new_game(finished=True)
+        self.game.update_player_board(6, 0, State.FILLED)
+        self.game.update_ai_board(6, 0, State.FILLED)
+
+    def test_can_lose(self):
+        self.game.update_ai_board(9, 9, State.EMPTY)
+
+        # Florence is logged in as an admin.
+        self.login_as_admin()
+
+        # She is nearly at the end of the game.
+        self.get('/game/{}'.format(self.game.pk))
+
+        # She performs a move and misses.
+        field = self.get_by_id('id_aifield_9_9')
+        field.click()
+        sleep(1)
+        self.assertEqual(field.value_of_css_property('background-color'), WHITE)
+
+        # Her opponent makes her last ship sunk.
+        log = self.get_by_id("log")
+        sleep(5)
+        self.assertTrue(log.text.endswith('Opponent sunk a ship!'))
+
+        # Florence sees a big header "YOU LOSE!".
+        self.assertEqual(self.get_by_id('id_game_over').text, "You lose!")

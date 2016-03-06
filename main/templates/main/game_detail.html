@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
 {% block content %}
+    <h1 id="id_game_over"></h1>
+
     <h2>Opponent</h2>
     {% with board_owner='ai' %}
         {% include 'main/snippets/board.html' %}
@@ -87,6 +89,13 @@
                     for(var i = 0; i < data.countermoves.length; ++i) {
                         var cm = data.countermoves[i];
                         ai_move(cm);
+                    }
+
+                    if(data.game_over == '1') {
+                        $('#id_game_over').show().html('You win!');
+                    }
+                    else if(data.game_over == '-1') {
+                        $('#id_game_over').show().html('You lose!');
                     }
                 }, 500);
             }
