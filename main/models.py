@@ -53,18 +53,21 @@ class Game(models.Model):
         self.save()
 
     def _hit_ship(self, owner, x, y):
-        field_name = '{}_ships'.format(owner)
-        ships = json.loads(getattr(self, field_name))
+        ships_field_name = '{}_ships'.format(owner)
+        board_field_name = '{}_board'.format(owner)
+        ships = json.loads(getattr(self, ships_field_name))
+        board = json.loads(getattr(self, board_field_name))
         point = [x, y]
         state = State.HIT
 
         for ship in ships:
             if point in ship:
-                if len(ship) == 1:
+                if all(int(board[i][j]) == State.HIT for (i, j) in ship if [i, j] != point):
                     state = State.SUNK
-                ship.remove(point)
                 break
 
-        setattr(self, field_name, json.dumps(ships))
+        setattr(self, ships_field_name, json.dumps(ships))
         self.save()
+        self._update_board(owner, x, y, state)
+
         return state
