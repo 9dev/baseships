@@ -86,5 +86,7 @@ def _place_ship(board, n):
                 ship = _build_ship(board, x, y, n, dx, dy)
                 if ship:
                     for xx, yy in ship:
-                        board[xx] = board[xx][:yy-1] + str(State.FILLED) + board[xx][yy:]
+                        row = list(board[xx])
+                        row[yy] = str(State.FILLED)
+                        board[xx] = ''.join(row)
                     return ship

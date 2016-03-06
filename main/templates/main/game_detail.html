@@ -82,14 +82,14 @@
                     $('#id_aifield_' + data.ai_sunk[i][0] + '_' + data.ai_sunk[i][1]).css('background-color', colors[4]);
                 }
 
-                for (i = 0; i < data.player_sunk.length; ++i) {
-                    $('#id_playerfield_' + data.player_sunk[i][0] + '_' + data.player_sunk[i][1]).css('background-color', colors[4]);
-                }
-
                 setTimeout(function () {
                     for (var i = 0; i < data.countermoves.length; ++i) {
                         var cm = data.countermoves[i];
                         ai_move(cm);
+                    }
+
+                    for (i = 0; i < data.player_sunk.length; ++i) {
+                        $('#id_playerfield_' + data.player_sunk[i][0] + '_' + data.player_sunk[i][1]).css('background-color', colors[4]);
                     }
 
                     if (data.game_over == 'V') {

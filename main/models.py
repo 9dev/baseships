@@ -77,9 +77,9 @@ class Game(models.Model):
                     state = State.SUNK
                     sunk = ship
 
-                    for x, y in ship:
-                        if [x, y] != point:
-                            self._update_board(owner, x, y, state)
+                    for i, j in ship:
+                        if [i, j] != point:
+                            self._update_board(owner, i, j, state)
                 break
 
         setattr(self, ships_field_name, json.dumps(ships))
