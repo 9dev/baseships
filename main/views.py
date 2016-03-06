@@ -7,7 +7,7 @@ from django.shortcuts import get_list_or_404
 from django.utils.decorators import method_decorator
 from django.views.generic import DetailView, FormView, TemplateView
 
-from main.ai import ai_moves
+from main.ai import ai_init, ai_moves
 from main.forms import NewGameForm
 from main.models import BOARD_SIZE, Game, SHIPS, State
 
@@ -28,10 +28,8 @@ class NewGameView(FormView):
 
     def form_valid(self, form):
         player_board = json.dumps(form.cleaned_data['fields'])
-        ai_board = json.dumps(form.cleaned_data['fields'])
-
         player_ships = json.dumps(form.cleaned_data['ships'])
-        ai_ships = json.dumps(form.cleaned_data['ships'])
+        ai_board, ai_ships = ai_init()
 
         game = Game.objects.create(
             player=self.request.user,
